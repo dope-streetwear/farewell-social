@@ -1,6 +1,7 @@
 services:
   - type: web
     name: farewell-social-backend
+    rootDirectory: backend
     env: node
     plan: free
     buildCommand: npm install && npm run build
