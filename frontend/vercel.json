@@ -2,7 +2,11 @@
     "rewrites": [
         {
             "source": "/api/(.*)",
-            "destination": "https://farewell-social-backend.loca.lt/api/$1"
+            "destination": "https://farewell-social-backend.onrender.com/api/$1"
+        },
+        {
+            "source": "/((?!api/).*)",
+            "destination": "/index.html"
         }
     ]
 }
