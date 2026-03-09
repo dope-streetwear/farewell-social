@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg-dark: #050816;
+  --color-primary: #1D2A4A;
+  --color-secondary: #FFD60A;
+  --color-accent-1: #7C3AED;
+  --color-accent-2: #14B8A6;
+  --color-error: #EF4444;
+
+  --font-inter: 'Inter', sans-serif;
+}
+
+/* Force Dark Mode Default + Flat design system base */
+@layer base {
+  body {
+    @apply bg-[var(--color-bg-dark)] text-white font-inter;
+    margin: 0;
+    min-height: 100vh;
+  }
+}
+
+/* Custom Base Utilities for the specific design guidelines */
+@layer utilities {
+  .bg-primary {
+    background-color: var(--color-primary);
+  }
+
+  .bg-secondary {
+    background-color: var(--color-secondary);
+  }
+
+  .bg-accent-1 {
+    background-color: var(--color-accent-1);
+  }
+
+  .bg-accent-2 {
+    background-color: var(--color-accent-2);
+  }
+
+  .text-primary {
+    color: var(--color-primary);
+  }
+
+  .text-secondary {
+    color: var(--color-secondary);
+  }
+
+  .text-accent-1 {
+    color: var(--color-accent-1);
+  }
+
+  .text-accent-2 {
+    color: var(--color-accent-2);
+  }
+
+  /* Buttons and Cards rules: no gradients, solid fills, slightly rounded */
+  .card {
+    @apply bg-primary rounded-xl border border-white/10 overflow-hidden;
+  }
+
+  .btn-solid {
+    @apply rounded-lg font-bold px-4 py-2 transition-transform active:scale-95;
+  }
+
+  /* Marquee animation */
+  @keyframes marquee {
+    0% {
+      transform: translateX(100vw);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  .animate-marquee {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 12s linear infinite;
+  }
+}

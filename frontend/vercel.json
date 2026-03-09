@@ -1,0 +1,8 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/(.*)",
+            "destination": "https://farewell-social-backend.loca.lt/api/$1"
+        }
+    ]
+}
