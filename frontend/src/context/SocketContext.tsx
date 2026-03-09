@@ -23,7 +23,16 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
 
     useEffect(() => {
         // Connect to the backend socket server
-        const backendUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        // WebSockets MUST use the full URL (Render) because Vercel proxy doesn't support them.
+        let backendUrl = import.meta.env.VITE_API_URL;
+
+        if (!backendUrl && import.meta.env.PROD) {
+            // Fallback for production if they forgot the env var
+            backendUrl = 'https://farewell-social-backend.onrender.com';
+        } else if (!backendUrl) {
+            backendUrl = 'http://localhost:5000';
+        }
+
         const socketInstance = io(backendUrl, {
             withCredentials: true,
             transports: ['websocket', 'polling']

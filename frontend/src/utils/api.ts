@@ -1,8 +1,10 @@
 const getApiUrl = () => {
-    // This uses the Vite environment variable convention.
-    // In development, VITE_API_URL might be http://localhost:3000
-    // In production, it will be your deployed backend URL on Render.
-    return import.meta.env.VITE_API_URL || '';
+    // In production, we use Vercel's proxy (/api/...) to avoid CORS issues.
+    // In development, we use the local backend URL.
+    if (import.meta.env.PROD) {
+        return '';
+    }
+    return import.meta.env.VITE_API_URL || 'http://localhost:5000';
 };
 
 export const api = async (
