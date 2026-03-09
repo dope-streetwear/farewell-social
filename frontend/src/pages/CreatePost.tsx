@@ -7,6 +7,7 @@ import { MusicSearch } from '../components/ui/MusicSearch';
 import { MentionInput } from '../components/ui/MentionInput';
 import { useAuth } from '../context/AuthContext';
 import type { ISong } from '../components/ui/MusicSearch';
+import { api } from '../utils/api';
 
 export const CreatePost: React.FC = () => {
     const navigate = useNavigate();
@@ -152,20 +153,13 @@ export const CreatePost: React.FC = () => {
         }
 
         try {
-            const res = await fetch('/api/posts', {
+            await api('/api/posts', {
                 method: 'POST',
-                // Omit Content-Type so browser sets boundary for multipart/form-data
                 body: formData,
             });
-
-            if (res.ok) {
-                navigate('/feed');
-            } else {
-                const data = await res.json();
-                setError(data.message || 'Failed to create post');
-            }
-        } catch (err) {
-            setError('Network error');
+            navigate('/feed');
+        } catch (err: any) {
+            setError(err.message || 'Failed to create post');
         } finally {
             setLoading(false);
         }

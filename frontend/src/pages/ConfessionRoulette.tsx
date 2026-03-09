@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Send, Sparkles, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { api } from '../utils/api';
 
 export default function ConfessionRoulette() {
     const navigate = useNavigate();
@@ -33,12 +34,7 @@ export default function ConfessionRoulette() {
         setReadError('');
 
         try {
-            const res = await fetch('/api/confessions/roulette');
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Failed to fetch confession');
-            }
-            const data = await res.json();
+            const data = await api('/api/confessions/roulette');
             setConfession(data);
         } catch (err: any) {
             setReadError(err.message);
@@ -96,13 +92,10 @@ export default function ConfessionRoulette() {
         setWriteSuccess('');
 
         try {
-            const res = await fetch('/api/confessions', {
+            await api('/api/confessions', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content, backgroundGradient: gradient })
             });
-
-            if (!res.ok) throw new Error('Failed to submit confession');
 
             setWriteSuccess('Confession dropped anonymously! 🤫');
             setContent('');

@@ -6,6 +6,7 @@ import { PenSquare, Loader2 } from 'lucide-react';
 import { SpotlightCard } from '../components/ui/SpotlightCard';
 import { StoryBar } from '../components/stories/StoryBar';
 import { FlashChallengeCard } from '../components/ui/FlashChallengeCard';
+import { api } from '../utils/api';
 
 export const Feed: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -22,11 +23,8 @@ export const Feed: React.FC = () => {
 
     const fetchSpotlight = async () => {
         try {
-            const res = await fetch('/api/users/spotlight');
-            if (res.ok) {
-                const data = await res.json();
-                setSpotlightUser(data);
-            }
+            const data = await api('/api/users/spotlight');
+            setSpotlightUser(data);
         } catch (err) {
             console.error('Spotlight fetch error:', err);
         } finally {
@@ -36,22 +34,17 @@ export const Feed: React.FC = () => {
 
     const fetchPosts = async () => {
         try {
-            const res = await fetch('/api/posts?page=1&limit=20');
-            if (res.ok) {
-                const data = await res.json();
-                // Map backend field names to frontend Post interface
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const mapped = (data || []).map((p: any) => ({
-                    ...p,
-                    author: p.authorId || p.author,
-                }));
-                setPosts(mapped);
-            } else {
-                setError('Failed to fetch feed');
-            }
-        } catch (err) {
+            const data = await api('/api/posts?page=1&limit=20');
+            // Map backend field names to frontend Post interface
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const mapped = (data || []).map((p: any) => ({
+                ...p,
+                author: p.authorId || p.author,
+            }));
+            setPosts(mapped);
+        } catch (err: any) {
             console.error('Network error fetching posts:', err);
-            setError('Network error');
+            setError(err.message || 'Network error');
         } finally {
             setLoading(false);
         }

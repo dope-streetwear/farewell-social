@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, Send, PenTool, Globe, Lock, Search } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { api } from '../utils/api';
 
 // Mock types
 interface User {
@@ -37,11 +38,8 @@ export default function FarewellLetters() {
     const fetchFeed = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/letters/feed');
-            if (res.ok) {
-                const data = await res.json();
-                setLetters(data);
-            }
+            const data = await api('/api/letters/feed');
+            setLetters(data);
         } catch (e) {
             console.error(e);
         } finally {
@@ -52,11 +50,8 @@ export default function FarewellLetters() {
     const fetchMyLetters = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/letters/me');
-            if (res.ok) {
-                const data = await res.json();
-                setMyLetters(data);
-            }
+            const data = await api('/api/letters/me');
+            setMyLetters(data);
         } catch (e) {
             console.error(e);
         } finally {
@@ -74,16 +69,10 @@ export default function FarewellLetters() {
         setError('');
         setSubmitting(true);
         try {
-            const res = await fetch('/api/letters', {
+            await api('/api/letters', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ recipientUsername: recipient, content, isPublic, paperStyle })
             });
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Failed to send letter');
-            }
-
             // Success
             setRecipient('');
             setContent('');

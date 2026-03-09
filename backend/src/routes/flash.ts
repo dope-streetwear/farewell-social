@@ -35,9 +35,9 @@ router.get('/current', protectRoute, async (req, res) => {
 
         // Check if user has already responded
         const response = await FlashResponse.findOne({
-            challengeId: challenge._id,
+            challengeId: (challenge as any)._id,
             authorId: (req as any).user._id
-        });
+        } as any);
 
         res.status(200).json({ challenge, hasResponded: !!response });
     } catch (error) {

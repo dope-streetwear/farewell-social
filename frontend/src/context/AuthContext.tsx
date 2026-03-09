@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { api } from '../utils/api';
 
 export interface User {
     _id: string;
@@ -30,11 +31,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         const fetchMe = async () => {
             try {
-                const res = await fetch('/api/auth/me');
-                if (res.ok) {
-                    const data = await res.json();
-                    setUser(data);
-                }
+                const data = await api('/api/auth/me');
+                setUser(data);
             } catch (error) {
                 console.error('Failed to fetch user', error);
             } finally {
@@ -44,8 +42,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         const checkAdmin = async () => {
             try {
-                const res = await fetch('/api/admin/me');
-                setIsAdmin(res.ok);
+                await api('/api/admin/me');
+                setIsAdmin(true);
             } catch {
                 setIsAdmin(false);
             }
@@ -58,7 +56,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const login = (userData: User) => setUser(userData);
     const logout = async () => {
         try {
-            await fetch('/api/auth/logout', { method: 'POST' });
+            await api('/api/auth/logout', { method: 'POST' });
         } catch {
             // ignore network error — still clear local state
         }

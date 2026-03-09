@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Trash2, Eye, FileBadge, LogOut, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { VerifiedBadge, TIER_OPTIONS } from '../components/ui/VerifiedBadge';
+import { api } from '../utils/api';
 
 interface UserStats {
     postsCount: number;
@@ -37,19 +38,14 @@ export const AdminDashboard = () => {
 
     const fetchUsers = async () => {
         try {
-            const res = await fetch('/api/admin/users/stats');
-            if (res.status === 401) {
+            const data = await api('/api/admin/users/stats');
+            setUsers(data);
+        } catch (err: any) {
+            if (err.message.includes('401')) {
                 navigate('/admin/login');
                 return;
             }
-            const data = await res.json();
-            if (res.ok) {
-                setUsers(data);
-            } else {
-                setError(data.message || 'Failed to fetch users');
-            }
-        } catch (err) {
-            setError('Network error');
+            setError(err.message || 'Network error');
         } finally {
             setLoading(false);
         }
@@ -59,37 +55,28 @@ export const AdminDashboard = () => {
         if (!confirm('Are you absolutely sure you want to delete this user? This cannot be undone.')) return;
 
         try {
-            const res = await fetch(`/api/admin/users/${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                setUsers(users.filter(u => u._id !== id));
-            } else {
-                const data = await res.json();
-                alert(data.message || 'Failed to delete');
-            }
-        } catch (err) {
-            alert('Failed to delete user');
+            await api(`/api/admin/users/${id}`, { method: 'DELETE' });
+            setUsers(users.filter(u => u._id !== id));
+        } catch (err: any) {
+            alert(err.message || 'Failed to delete user');
         }
     };
 
     const handleSetTier = async (id: string, tier: number) => {
         try {
-            const res = await fetch(`/api/admin/users/${id}/verify`, {
+            const data = await api(`/api/admin/users/${id}/verify`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ tier })
             });
-            if (res.ok) {
-                const data = await res.json();
-                setUsers(users.map(u => u._id === id ? { ...u, verificationTier: data.verificationTier } : u));
-            }
-        } catch (err) {
-            alert('Failed to update verification tier');
+            setUsers(users.map(u => u._id === id ? { ...u, verificationTier: data.verificationTier } : u));
+        } catch (err: any) {
+            alert(err.message || 'Failed to update verification tier');
         }
     };
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/admin/logout', { method: 'POST' });
+            await api('/api/admin/logout', { method: 'POST' });
             navigate('/admin/login');
         } catch (err) {
             console.error('Logout failed', err);
@@ -262,3 +249,4 @@ export const AdminDashboard = () => {
         </div>
     );
 };
+

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Loader2, Sparkles, CheckCircle2, XCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { api } from '../utils/api';
 
 interface TriviaOption {
     _id: string;
@@ -38,12 +39,7 @@ export default function BabyTrivia() {
         setSelectedOption(null);
 
         try {
-            const res = await fetch('/api/trivia/question');
-            if (!res.ok) {
-                const data = await res.json();
-                throw new Error(data.message || 'Failed to fetch question');
-            }
-            const data = await res.json();
+            const data = await api('/api/trivia/question');
             setQuestion(data);
         } catch (err: any) {
             setError(err.message);
@@ -63,18 +59,14 @@ export default function BabyTrivia() {
         setSubmitting(true);
 
         try {
-            const res = await fetch('/api/trivia/guess', {
+            const result = await api('/api/trivia/guess', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     questionId: question.questionId,
                     guessedUserId
                 })
             });
 
-            if (!res.ok) throw new Error('Failed to submit guess');
-
-            const result = await res.json();
             setGuessResult(result);
 
             if (result.isCorrect) {

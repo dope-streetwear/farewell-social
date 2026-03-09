@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Trophy, Search, Heart, DoorOpen, Globe, Smile, Moon } from 'lucide-react';
 import { Button } from '../components/ui/Button';
+import { api } from '../utils/api';
 
 // Utility to render Lucide icons dynamically from string names stored in DB
 const IconRenderer = ({ name, className }: { name: string, className?: string }) => {
@@ -44,12 +45,9 @@ export default function Awards() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const res = await fetch('/api/superlatives');
-            if (res.ok) {
-                const data = await res.json();
-                setSuperlatives(data.superlatives);
-                setMyVotes(data.myVotes);
-            }
+            const data = await api('/api/superlatives');
+            setSuperlatives(data.superlatives);
+            setMyVotes(data.myVotes);
         } catch (e) {
             console.error('Failed to fetch superlatives', e);
         } finally {
@@ -71,11 +69,8 @@ export default function Awards() {
         const delayFn = setTimeout(async () => {
             setSearching(true);
             try {
-                const res = await fetch(`/api/superlatives/search?q=${encodeURIComponent(searchQuery)}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setSearchResults(data);
-                }
+                const data = await api(`/api/superlatives/search?q=${encodeURIComponent(searchQuery)}`);
+                setSearchResults(data);
             } catch (e) { }
             finally { setSearching(false); }
         }, 300);
@@ -86,17 +81,13 @@ export default function Awards() {
     const castVote = async (nomineeId: string) => {
         if (!activeAward) return;
         try {
-            const res = await fetch(`/api/superlatives/${activeAward._id}/vote`, {
+            await api(`/api/superlatives/${activeAward._id}/vote`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ nomineeId })
             });
-
-            if (res.ok) {
-                setActiveAward(null);
-                setSearchQuery('');
-                fetchData();
-            }
+            setActiveAward(null);
+            setSearchQuery('');
+            fetchData();
         } catch (e) {
             console.error('Failed to vote', e);
         }

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { Card } from '../components/ui/Card';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../utils/api';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
@@ -26,18 +27,10 @@ export const Login: React.FC = () => {
         setError('');
 
         try {
-            const res = await fetch('/api/auth/google', {
+            const data = await api('/api/auth/google', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential }),
             });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setError(data.message || 'Authentication failed');
-                return;
-            }
 
             if (data.needsSignup) {
                 // New user — send to signup page with their Google info pre-filled
@@ -55,8 +48,8 @@ export const Login: React.FC = () => {
                 login(data);
                 navigate('/feed');
             }
-        } catch {
-            setError('Network error. Make sure the server is running.');
+        } catch (err: any) {
+            setError(err.message || 'Network error. Make sure the server is running.');
         } finally {
             setLoading(false);
         }

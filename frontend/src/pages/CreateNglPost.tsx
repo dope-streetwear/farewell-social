@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { ImagePlus, X, ShieldCheck, Mic, Square } from 'lucide-react';
 import { PrivacyBadge } from '../components/ui/PrivacyBadge';
+import { api } from '../utils/api';
 
 export const NGL_THEMES = [
     { id: 'default', label: 'Default', prompt: 'Send me an anonymous message!', gradient: 'from-gray-800 to-gray-900 border border-white/10', emoji: '🤫' },
@@ -138,19 +139,13 @@ export const CreateNglPost: React.FC = () => {
         formData.append('theme', theme);
 
         try {
-            const res = await fetch('/api/ngl/posts', {
+            await api('/api/ngl/posts', {
                 method: 'POST',
                 body: formData,
             });
-
-            if (res.ok) {
-                navigate('/ngl');
-            } else {
-                const data = await res.json();
-                setError(data.message || 'Failed to submit post');
-            }
-        } catch {
-            setError('Network error');
+            navigate('/ngl');
+        } catch (err: any) {
+            setError(err.message || 'Failed to submit post');
         } finally {
             setLoading(false);
         }

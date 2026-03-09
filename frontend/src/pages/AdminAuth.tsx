@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, ShieldAlert, KeyRound, Mail } from 'lucide-react';
+import { api } from '../utils/api';
 
 export const AdminAuth = () => {
     const [passcode, setPasscode] = useState('');
@@ -15,20 +16,13 @@ export const AdminAuth = () => {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/admin/login', {
+            await api('/api/admin/login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ passcode, isBackupCode: isBackupMode })
             });
-
-            const data = await res.json();
-            if (res.ok) {
-                navigate('/admin/dashboard');
-            } else {
-                setError(data.message || 'Login failed');
-            }
-        } catch (err) {
-            setError('Network error');
+            navigate('/admin/dashboard');
+        } catch (err: any) {
+            setError(err.message || 'Login failed');
         } finally {
             setLoading(false);
         }
@@ -42,19 +36,13 @@ export const AdminAuth = () => {
         setError('');
         setLoading(true);
         try {
-            const res = await fetch('/api/admin/google-login', {
+            await api('/api/admin/google-login', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email })
             });
-            const data = await res.json();
-            if (res.ok) {
-                navigate('/admin/dashboard');
-            } else {
-                setError(data.message || 'Unauthorized email');
-            }
-        } catch (err) {
-            setError('Network error');
+            navigate('/admin/dashboard');
+        } catch (err: any) {
+            setError(err.message || 'Unauthorized email');
         } finally {
             setLoading(false);
         }
