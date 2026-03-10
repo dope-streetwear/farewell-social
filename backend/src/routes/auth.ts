@@ -165,13 +165,18 @@ router.post('/google', async (req, res) => {
 // Multipart: credential, verificationImage, username, classSection
 // (displayName and email taken from verified Google token — no user spoofing)
 const handleUpload = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    upload.single('verificationImage')(req, res, (err: any) => {
-        if (err) {
-            console.error('Upload Error:', err);
-            return res.status(400).json({ message: `Image upload failed: ${err.message || 'Please try a smaller image'}` });
-        }
-        next();
-    });
+    try {
+        upload.single('verificationImage')(req, res, (err: any) => {
+            if (err) {
+                console.error('Upload Error Caught by Multer Callback:', err);
+                return res.status(400).json({ message: `Image upload failed: ${err.message || 'Please try a smaller image'}` });
+            }
+            next();
+        });
+    } catch (criticalError: any) {
+        console.error('Critical Upload Error Caught by Wrapper:', criticalError);
+        return res.status(500).json({ message: 'A critical error occurred while processing the image upload.' });
+    }
 };
 
 router.post('/google/signup', handleUpload, async (req, res) => {

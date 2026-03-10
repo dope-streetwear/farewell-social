@@ -13,12 +13,17 @@ cloudinary.config({
 export const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: async (req, file) => {
-        return {
-            folder: 'farewell_social',
-            resource_type: 'auto',
-            public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
-            transformation: [{ width: 1000, crop: 'limit', fetch_format: 'auto', quality: 'auto' }]
-        };
+        try {
+            return {
+                folder: 'farewell_social',
+                resource_type: 'auto',
+                public_id: `${Date.now()}-${file.originalname.split('.')[0]}`,
+                transformation: [{ width: 1000, crop: 'limit', fetch_format: 'auto', quality: 'auto' }]
+            };
+        } catch (error) {
+            console.error('Cloudinary Storage Config Error:', error);
+            throw new Error('Failed to configure image upload storage. Please try again.');
+        }
     },
 });
 
