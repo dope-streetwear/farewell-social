@@ -150,7 +150,17 @@ router.post('/google', async (req, res) => {
 // POST /api/auth/google/signup
 // Multipart: credential, verificationImage, username, classSection
 // (displayName and email taken from verified Google token — no user spoofing)
-router.post('/google/signup', upload.single('verificationImage'), async (req, res) => {
+const handleUpload = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    upload.single('verificationImage')(req, res, (err: any) => {
+        if (err) {
+            console.error('Upload Error:', err);
+            return res.status(400).json({ message: `Image upload failed: ${err.message || 'Please try a smaller image'}` });
+        }
+        next();
+    });
+};
+
+router.post('/google/signup', handleUpload, async (req, res) => {
     try {
         const { credential, username, classSection } = req.body;
         const file = req.file;
