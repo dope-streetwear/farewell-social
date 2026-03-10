@@ -148,6 +148,16 @@ io.on('connection', (socket) => {
     });
 });
 
+import { ErrorRequestHandler } from 'express';
+
+// Global error handler to catch unhandled promise rejections or sync crashes
+// Guarantees our frontend *always* receives JSON instead of Express default HTML
+const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+    console.error('Unhandled Server Error Caught by Global Handler:', err);
+    res.status(500).json({ message: err.message || 'An unexpected error occurred on the server.' });
+};
+app.use(globalErrorHandler);
+
 // Start server
 httpServer.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

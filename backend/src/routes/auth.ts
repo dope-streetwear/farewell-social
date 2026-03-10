@@ -9,6 +9,14 @@ import AuditLog from '../models/AuditLog.js';
 
 const router = express.Router();
 
+const safeDestroy = async (filename: string) => {
+    try {
+        await cloudinary.uploader.destroy(filename);
+    } catch (error) {
+        console.error('Failed to cleanup Cloudinary image:', filename, error);
+    }
+};
+
 // ─── Multer (for OCR verification image upload during first signup) ────────────
 import { storage } from '../config/cloudinary.js';
 import cloudinary from '../config/cloudinary.js';
@@ -172,11 +180,11 @@ router.post('/google/signup', handleUpload, async (req, res) => {
         const file = req.file;
 
         if (!credential) {
-            if (file) await cloudinary.uploader.destroy(file.filename);
+            if (file) await safeDestroy(file.filename);
             return res.status(400).json({ message: 'Google credential is required' });
         }
         if (!username) {
-            if (file) await cloudinary.uploader.destroy(file.filename);
+            if (file) await safeDestroy(file.filename);
             return res.status(400).json({ message: 'Username is required' });
         }
         if (!file) {
@@ -188,19 +196,19 @@ router.post('/google/signup', handleUpload, async (req, res) => {
         try {
             googleUser = await verifyGoogleToken(credential);
         } catch {
-            if (file) await cloudinary.uploader.destroy(file.filename);
+            if (file) await safeDestroy(file.filename);
             return res.status(401).json({ message: 'Google credential is invalid or expired. Please sign in again.' });
         }
 
         // Check uniqueness before OCR
         const existingEmail = await User.findOne({ email: googleUser.email });
         if (existingEmail) {
-            if (file) await cloudinary.uploader.destroy(file.filename);
+            if (file) await safeDestroy(file.filename);
             return res.status(400).json({ message: 'An account with this Google email already exists. Please login instead.' });
         }
         const existingUsername = await User.findOne({ username });
         if (existingUsername) {
-            if (file) await cloudinary.uploader.destroy(file.filename);
+            if (file) await safeDestroy(file.filename);
             return res.status(400).json({ message: 'Username is already taken. Please choose another.' });
         }
 
@@ -211,14 +219,14 @@ router.post('/google/signup', handleUpload, async (req, res) => {
             await worker.terminate();
 
             if (!isValidNarayanaImage(text)) {
-                if (file) await cloudinary.uploader.destroy(file.filename);
+                if (file) await safeDestroy(file.filename);
                 return res.status(400).json({
                     message: 'Verification failed. Image does not appear to be a valid 10th Grade Narayana ID card or nConnect App screenshot. Make sure your grade (e.g. 10th, Class X) is clearly visible.'
                 });
             }
         } catch (ocrError) {
             console.error('OCR Error:', ocrError);
-            if (file) await cloudinary.uploader.destroy(file.filename);
+            if (file) await safeDestroy(file.filename);
             return res.status(500).json({ message: 'Error processing verification image. Please try a clearer image.' });
         }
 
@@ -263,7 +271,7 @@ router.post('/google/signup', handleUpload, async (req, res) => {
             verificationTier: newUser.verificationTier,
         });
     } catch (error) {
-        if (req.file) await cloudinary.uploader.destroy(req.file.filename);
+        if (req.file) await safeDestroy(req.file.filename);
         console.error('Error in google signup:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
