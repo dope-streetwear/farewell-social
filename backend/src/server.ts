@@ -10,10 +10,37 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || 'http://localhost:5173';
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.CLIENT_ORIGIN || ''
+].filter(Boolean);
+
+const corsOptions = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) {
+            return callback(null, true);
+        }
+
+        // Allow strictly defined origins
+        if (allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+
+        // Allow any vercel deployment
+        if (origin.endsWith('vercel.app')) {
+            return callback(null, true);
+        }
+
+        callback(new Error('Not allowed by CORS'));
+    },
+    credentials: true,
+};
+
 export const io = new Server(httpServer, {
     cors: {
-        origin: CLIENT_ORIGIN,
+        origin: corsOptions.origin,
         methods: ["GET", "POST"],
         credentials: true
     }
@@ -21,10 +48,7 @@ export const io = new Server(httpServer, {
 const PORT = process.env.PORT || 5000;
 
 // Middleware
-app.use(cors({
-    origin: CLIENT_ORIGIN,
-    credentials: true
-}));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
