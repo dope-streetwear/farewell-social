@@ -4,6 +4,7 @@ import { GoogleLogin, type CredentialResponse } from '@react-oauth/google';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
+import { getApiUrl } from '../utils/api';
 
 interface GoogleState {
     credential: string;
@@ -54,7 +55,8 @@ export const Signup: React.FC = () => {
         setError('');
 
         try {
-            const res = await fetch('/api/auth/google', {
+            const apiUrl = getApiUrl();
+            const res = await fetch(`${apiUrl}/api/auth/google`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ credential: credentialResponse.credential }),
@@ -81,8 +83,8 @@ export const Signup: React.FC = () => {
                 picture: data.picture,
             });
             setStep(2);
-        } catch {
-            setError('Network error. Make sure the server is running.');
+        } catch (err: any) {
+            setError(err.message || 'Network error. Make sure the server is running.');
         } finally {
             setLoading(false);
         }
@@ -112,7 +114,8 @@ export const Signup: React.FC = () => {
         formData.append('verificationImage', verificationImage);
 
         try {
-            const res = await fetch('/api/auth/google/signup', {
+            const apiUrl = getApiUrl();
+            const res = await fetch(`${apiUrl}/api/auth/google/signup`, {
                 method: 'POST',
                 body: formData,
             });
@@ -124,8 +127,8 @@ export const Signup: React.FC = () => {
             } else {
                 setError(data.message || 'Signup failed');
             }
-        } catch {
-            setError('Network error. Make sure the server is running.');
+        } catch (err: any) {
+            setError(err.message || 'Network error. Make sure the server is running.');
         } finally {
             setLoading(false);
         }

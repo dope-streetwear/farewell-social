@@ -237,7 +237,7 @@ export const AdminDashboard = () => {
                                 <X size={24} />
                             </button>
                             <img
-                                src={selectedImage.startsWith('http') ? selectedImage : `http://localhost:5000${selectedImage}`}
+                                src={selectedImage.startsWith('http') ? selectedImage : `${import.meta.env.VITE_API_URL || ''}${selectedImage}`}
                                 alt="Verification Proof"
                                 className="w-full h-auto max-h-[85vh] object-contain rounded-xl shadow-2xl border border-white/10"
                             />

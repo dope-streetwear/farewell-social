@@ -1,10 +1,11 @@
-const getApiUrl = () => {
-    // In production, we use Vercel's proxy (/api/...) to avoid CORS issues.
-    // In development, we use the local backend URL.
-    if (import.meta.env.PROD) {
-        return '';
+export const getApiUrl = () => {
+    let url = import.meta.env.VITE_API_URL;
+    if (!url && import.meta.env.PROD) {
+        url = 'https://farewell-social-backend.onrender.com';
+    } else if (!url) {
+        url = 'http://localhost:5000';
     }
-    return import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    return url.replace(/\/$/, ''); // Remove trailing slash if present
 };
 
 export const api = async (
