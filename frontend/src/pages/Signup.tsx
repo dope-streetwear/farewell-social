@@ -200,7 +200,7 @@ export const Signup: React.FC = () => {
 
                 <div className="text-center mb-6">
                     <h1 className="text-2xl font-black text-white mb-1">One Last Step</h1>
-                    <p className="text-white/60 text-sm">Verify you're a Narayana student to complete signup</p>
+                    <p className="text-white/60 text-sm">Verify you're a 10th Grade Narayana student to complete signup</p>
                 </div>
 
                 <div className="bg-white/5 border border-white/10 p-4 rounded-xl mb-6 text-sm">
@@ -208,11 +208,11 @@ export const Signup: React.FC = () => {
                     <div className="space-y-3">
                         <div className="bg-white/5 p-3 rounded-lg">
                             <p className="font-bold text-white text-xs mb-1">ID Card Method</p>
-                            <p className="text-white/60 text-xs">Take a clear photo of your Narayana ID card and upload it below.</p>
+                            <p className="text-white/60 text-xs">Take a clear photo of your 10th Grade Narayana ID card and upload it below. Make sure "10th" or "Class X" is visible!</p>
                         </div>
                         <div className="bg-white/5 p-3 rounded-lg">
                             <p className="font-bold text-white text-xs mb-1">App Screenshot Method</p>
-                            <p className="text-white/60 text-xs">Open nConnect App → tap Profile icon → screenshot the dropdown with your details → upload below.</p>
+                            <p className="text-white/60 text-xs">Open nConnect App → tap Profile icon → screenshot the dropdown with your 10th Grade details → upload below.</p>
                         </div>
                     </div>
                 </div>

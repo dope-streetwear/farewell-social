@@ -75,12 +75,18 @@ const verifyGoogleToken = async (credential: string) => {
  */
 const isValidNarayanaImage = (rawText: string): boolean => {
     const t = rawText.toUpperCase();
+
+    // Check for Narayana/School keywords
     const hasNarayana = t.includes('NARAYANA');
     const hasAppKeywords =
         t.includes('ADMISSION') &&
         (t.includes('CLASS') || t.includes('GROUP') || t.includes('BRANCH') ||
             t.includes('ETECHNO') || t.includes('E-TECHNO') || t.includes('REGULAR') || t.includes('TECHNO'));
-    return hasNarayana || hasAppKeywords;
+
+    // Strict 10th grade check
+    const isTenthGrade = /(10TH|10 TH|CLASS X|CLASS-X|CLASS 10|GRADE 10|X REGULAR|X ETECHNO|X-REGULAR)/.test(t);
+
+    return (hasNarayana || hasAppKeywords) && isTenthGrade;
 };
 
 // ─── GOOGLE AUTH — Login or detect new user ───────────────────────────────────
@@ -207,7 +213,7 @@ router.post('/google/signup', handleUpload, async (req, res) => {
             if (!isValidNarayanaImage(text)) {
                 if (file) await cloudinary.uploader.destroy(file.filename);
                 return res.status(400).json({
-                    message: 'Verification failed. Image does not appear to be a valid Narayana ID card or nConnect App screenshot. Make sure the image is clear and shows Narayana branding.'
+                    message: 'Verification failed. Image does not appear to be a valid 10th Grade Narayana ID card or nConnect App screenshot. Make sure your grade (e.g. 10th, Class X) is clearly visible.'
                 });
             }
         } catch (ocrError) {
